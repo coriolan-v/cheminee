@@ -13,7 +13,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include <bluefruit.h>
 #include <FastLED.h> // https://github.com/FastLED/FastLED
 
 FASTLED_USING_NAMESPACE
@@ -32,12 +32,12 @@ FASTLED_USING_NAMESPACE
 #endif
 
 // change these to match your data pin, LED type, and color order
-#define DATA_PIN 5
+#define DATA_PIN MOSI
 #define DATA_PIN_2 6
-#define LED_TYPE WS2812B
-#define COLOR_ORDER GRB
+#define LED_TYPE WS2811
+#define COLOR_ORDER BRG // RBG
 
-#define BRIGHTNESS 32
+#define BRIGHTNESS 128
 
 // start of data copied from LED Mapper:
 
@@ -50,13 +50,13 @@ byte radii[NUM_LEDS] = { 255, 250, 245, 240, 235, 230, 224, 219, 214, 209, 204, 
 // end of data copied from LED Mapper
 
 CRGB leds[NUM_LEDS];
-CRGB leds2[NUM_LEDS];
+//CRGB leds2[NUM_LEDS];
 
-#define FRAMES_PER_SECOND 120
+#define FRAMES_PER_SECOND 60
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 uint8_t offset = 0; // rotating "base color" used by many of the patterns
-uint8_t speed = 30;
+uint8_t speed = 15;
 
 boolean autoplay = true;
 uint8_t autoplaySeconds = 2;
@@ -69,10 +69,10 @@ void setup()
 
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS);
-  FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds2, NUM_LEDS);
+  //FastLED.addLeds<LED_TYPE, DATA_PIN_2, COLOR_ORDER>(leds, NUM_LEDS);
   FastLED.setCorrection(TypicalSMD5050);
 
-  FastLED.setMaxPowerInVoltsAndMilliamps(12, 1000); // 1A
+  //FastLED.setMaxPowerInVoltsAndMilliamps(12, 1000); // 1A
 
   FastLED.setBrightness(BRIGHTNESS);
 }
@@ -106,7 +106,7 @@ SimplePatternList patterns = {
 
 const uint8_t patternCount = ARRAY_SIZE(patterns);
 
-uint8_t currentPatternIndex = 12; // Index number of which pattern is current
+uint8_t currentPatternIndex = 3; // Index number of which pattern is current
 
 CRGBPalette16 IceColors_p = CRGBPalette16(CRGB::Black, CRGB::Blue, CRGB::Aqua, CRGB::White);
 
@@ -138,22 +138,22 @@ void loop()
   offset = beat8(speed);
 
   // do some periodic updates
-  EVERY_N_SECONDS(autoplaySeconds)
-  {
-    if (autoplay)
-    {
-      nextPattern(); // change patterns periodically
-    }
-  }
+  // EVERY_N_SECONDS(autoplaySeconds)
+  // {
+  //   if (autoplay)
+  //   {
+  //     nextPattern(); // change patterns periodically
+  //   }
+  // }
 
-  EVERY_N_SECONDS(autoplayPaletteSeconds)
-  {
-    // change palettes periodically
-    if (autoplayPalettes)
-    {
-      nextPalette();
-    }
-  }
+  // EVERY_N_SECONDS(autoplayPaletteSeconds)
+  // {
+  //   // change palettes periodically
+  //   if (autoplayPalettes)
+  //   {
+  //     nextPalette();
+  //   }
+  // }
 
   // send the 'leds' array out to the actual LED strip
   // FastLED.show(); called automatically, internally by FastLED.delay below:
@@ -184,10 +184,10 @@ void inwardsAndOutwardsPalettes()
     leds[i] = ColorFromPalette(currentPalette, offset + radii[i]);
   }
 
-  for (uint16_t i = 0; i < NUM_LEDS; i++)
-  {
-    leds2[i] = ColorFromPalette(currentPalette, offset - radii[i]);
-  }
+  // for (uint16_t i = 0; i < NUM_LEDS; i++)
+  // {
+  //   leds2[i] = ColorFromPalette(currentPalette, offset - radii[i]);
+  // }
 }
 
 void clockwisePalette()
